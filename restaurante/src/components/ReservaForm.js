@@ -1,108 +1,98 @@
 import React, { useState } from 'react';
-import { View, Text, TextInput, Button, Alert } from 'react-native';
-import DateTimePickerModal from 'react-native-modal-datetime-picker';
+import { View, Text, TextInput, Button, StyleSheet, Picker, TimePickerAndroid, DatePickerAndroid } from 'react-native';
 
-const ReservaForm = ({ onReservaSubmit }) => {
+export default function ReservaForm({ agregarReserva }) {
   const [nombre, setNombre] = useState('');
   const [fecha, setFecha] = useState('');
   const [hora, setHora] = useState('');
-  const [cantidadPersonas, setCantidadPersonas] = useState('');
+  const [personas, setPersonas] = useState('');
+  const [seccion, setSeccion] = useState('No fumadores');
 
-  const [isDatePickerVisible, setDatePickerVisible] = useState(false);
-  const [isTimePickerVisible, setTimePickerVisible] = useState(false);
-
-  const showDatePicker = () => {
-    setDatePickerVisible(true);
-  };
-
-  const hideDatePicker = () => {
-    setDatePickerVisible(false);
-  };
-
-  const handleDateConfirm = (date) => {
-    hideDatePicker();
-    setFecha(date.toISOString()); // Convierte la fecha seleccionada en una cadena ISO
-  };
-
-  const showTimePicker = () => {
-    setTimePickerVisible(true);
-  };
-
-  const hideTimePicker = () => {
-    setTimePickerVisible(false);
-  };
-
-  const handleTimeConfirm = (time) => {
-    hideTimePicker();
-    const selectedTime = new Date(time);
-    const hours = selectedTime.getHours();
-    const minutes = selectedTime.getMinutes();
-    setHora(`${hours}:${minutes}`); // Formatea la hora seleccionada como "HH:mm"
-  };
-
-  const handleSubmit = () => {
-    // Validar los campos aquí
-    if (!nombre || !fecha || !hora || !cantidadPersonas) {
-      Alert.alert('Campos incompletos', 'Por favor, completa todos los campos.');
-      return;
-    }
-
-    // Crear un objeto con los datos de la reserva
-    const reserva = {
+  const handleAgregarReserva = () => {
+    const nuevaReserva = {
       nombre,
       fecha,
       hora,
-      cantidadPersonas: parseInt(cantidadPersonas, 10), // Convierte a número
+      personas,
+      seccion,
     };
 
-    // Llamar a la función de devolución de llamada para enviar la reserva
-    onReservaSubmit(reserva);
+    agregarReserva(nuevaReserva);
 
-    // Limpiar los campos después de enviar
     setNombre('');
     setFecha('');
     setHora('');
-    setCantidadPersonas('');
+    setPersonas('');
+    setSeccion('No fumadores');
   };
 
   return (
-    <View>
-      <Text>Nombre:</Text>
+    <View style={styles.container}>
+      <Text style={styles.label}>Nombre:</Text>
       <TextInput
+        style={styles.input}
         value={nombre}
         onChangeText={setNombre}
-        placeholder="Nombre del cliente"
+        placeholder="Ingrese su nombre"
       />
 
-      <Text>Fecha:</Text>
-      <Button title="Seleccionar Fecha" onPress={showDatePicker} />
-      <DateTimePickerModal
-        isVisible={isDatePickerVisible}
-        mode="date"
-        onConfirm={handleDateConfirm}
-        onCancel={hideDatePicker}
-      />
-
-      <Text>Hora:</Text>
-      <Button title="Seleccionar Hora" onPress={showTimePicker} />
-      <DateTimePickerModal
-        isVisible={isTimePickerVisible}
-        mode="time"
-        onConfirm={handleTimeConfirm}
-        onCancel={hideTimePicker}
-      />
-
-      <Text>Cantidad de Personas:</Text>
+      <Text style={styles.label}>Fecha:</Text>
       <TextInput
-        value={cantidadPersonas}
-        onChangeText={setCantidadPersonas}
-        placeholder="Cantidad de personas"
-        keyboardType="numeric"
+        style={styles.input}
+        value={fecha}
+        onChangeText={setFecha}
+        placeholder="Seleccione la fecha"
       />
 
-      <Button title="Hacer Reserva" onPress={handleSubmit} />
+      <Text style={styles.label}>Hora:</Text>
+      <TextInput
+        style={styles.input}
+        value={hora}
+        onChangeText={setHora}
+        placeholder="Seleccione la hora"
+      />
+
+      <Text style={styles.label}>Cantidad de Personas:</Text>
+      <TextInput
+        style={styles.input}
+        value={personas}
+        onChangeText={setPersonas}
+        placeholder="Ingrese la cantidad de personas"
+      />
+
+      <Text style={styles.label}>Sección:</Text>
+      <Picker
+        style={styles.picker}
+        selectedValue={seccion}
+        onValueChange={(itemValue) => setSeccion(itemValue)}
+      >
+        <Picker.Item label="No fumadores" value="No fumadores" />
+        <Picker.Item label="Fumadores" value="Fumadores" />
+      </Picker>
+
+      <Button title="Agregar Reserva" onPress={handleAgregarReserva} />
     </View>
   );
-};
+}
 
-export default ReservaForm;
+const styles = StyleSheet.create({
+  container: {
+    margin: 20,
+  },
+  label: {
+    fontSize: 18,
+    marginBottom: 5,
+  },
+  input: {
+    fontSize: 16,
+    borderWidth: 1,
+    borderColor: '#ccc',
+    borderRadius: 5,
+    padding: 10,
+    marginBottom: 15,
+  },
+  picker: {
+    fontSize: 16,
+    marginBottom: 15,
+  },
+});
